@@ -47,10 +47,11 @@
     },
     "web_accessible_resources": [
         {
-            "resources": [
-                "js/Mint.js",
-                "html/options.html"
-            ],
+          "resources": [
+            "js/Mint.js",
+            "html/options.html",
+            "assets/tts_files/*.mp3"
+          ],
             "matches": [
                 "https://*.chess.com/*"
             ]

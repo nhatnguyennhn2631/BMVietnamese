@@ -1051,7 +1051,7 @@ class StockfishEngine {
           const topMove = this.topMoves[0]; 
 
           const chars = topMove.move.split(''); 
-          const basePath = '../assets/tts_files/';
+          const basePath = chrome.runtime.getURL('assets/tts_files/');
           if (window.currentAudio) {
               window.currentAudio.pause();
               window.currentAudio.currentTime = 0;
