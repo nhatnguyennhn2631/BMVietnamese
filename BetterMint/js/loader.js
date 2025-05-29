@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 let inputObjects = {
   "option-url-api-stockfish": { default_value: "ws://localhost:8000/ws" },
@@ -77,3 +77,36 @@ window.addEventListener("BetterMintGetOptions", function (evt) {
 
 // Inject other necessary scripts automatically
 injectScript("js/Mint.js"); // Injects Mint.js for web-side functionality
+let userInteracted = false;
+
+window.addEventListener("click", () => userInteracted = true, { once: true });
+window.addEventListener("keydown", () => userInteracted = true, { once: true });
+
+window.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "BetterMintPlayTTS") return;
+  if (!userInteracted) {
+    console.warn("User chưa tương tác → không phát âm thanh được.");
+    return;
+  }
+
+  const chars = event.data.payload;
+  const basePath = chrome.runtime.getURL("assets/tts_files/");
+
+  function playSequentially(arr, index = 0) {
+    if (index >= arr.length) return;
+
+    const audio = new Audio(basePath + arr[index] + ".mp3");
+    window.currentAudio = audio;
+    audio.volume = 0.75;
+    audio.playbackRate = 2;
+    audio.play().then(() => {
+      audio.onended = () => {
+        playSequentially(arr, index + 1);
+      };
+    }).catch((err) => {
+      console.error("Lỗi phát âm thanh:", err);
+    });
+  }
+
+  playSequentially(chars);
+});

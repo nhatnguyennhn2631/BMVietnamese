@@ -1046,36 +1046,24 @@ class StockfishEngine {
         }
       }
     }
-    
-      if (getValueConfig(enumOptions.TextToSpeech)) {
-          const topMove = this.topMoves[0]; 
+    let lastSpokenMove = null;
+    if (getValueConfig(enumOptions.TextToSpeech)) {
+    const topMove = this.topMoves[0]; 
+    const moveStr = topMove.move;
 
-          const chars = topMove.move.split(''); 
-          const basePath = chrome.runtime.getURL('assets/tts_files/');
-          if (window.currentAudio) {
-              window.currentAudio.pause();
-              window.currentAudio.currentTime = 0;
-          }
+    if (moveStr === lastSpokenMove) {
+        // Đã phát âm thanh cho nước này rồi → bỏ qua
+        return;
+    }
 
-          function playSequentially(arr, index = 0) {
-              if (index >= arr.length) return;
+    lastSpokenMove = moveStr;
 
-              const audio = new Audio(basePath + arr[index] + '.mp3');
-              window.currentAudio = audio;
-              audio.volume = 0.75;
-              //speed
-              audio.playbackRate = 2;
-              audio.play().then(() => {
-                  audio.onended = () => {
-                      playSequentially(arr, index + 1);
-                  };
-              }).catch(err => {
-                  console.error('Lỗi phát âm thanh:', err);
-              });
-          }
-
-          playSequentially(chars);
-      }
+    const chars = moveStr.split('');
+    window.postMessage({
+        type: "BetterMintPlayTTS",
+        payload: chars
+    }, "*");
+}
 
     if (bestMoveSelected) {
       // If a best move has been selected, consider all moves in topMoves
